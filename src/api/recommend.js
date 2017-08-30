@@ -33,5 +33,6 @@ export function getDiscList() {
     params: data
   }).then((res) => {
     return Promise.resolve(res.data)
+    console.log(res.data);
   })
 }

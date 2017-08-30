@@ -16,6 +16,7 @@
 
 
   export default {
+    name: 'slider',
     props: {
       loop: {
         type: Boolean,

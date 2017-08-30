@@ -1,43 +1,61 @@
 <template>
 <div class="recommend" ref="recommend">
-  <div class="recommend-content" ref = "scroll">
+  <scroll class="recommend-content" ref="scroll" :data="discList">
     <div>
 
-    <div  v-if="recommends.length" class=" slider-wrapper" ref="sliderWrapper">
-      <slider>
-        <div v-for="item in recommends">
-          <a :href='item.linkUrl'>
-        <img :src ='item.picUrl' >
-
+      <div v-if="recommends.length" class=" slider-wrapper" ref="sliderWrapper">
+        <slider>
+          <div v-for="item in recommends">
+            <a :href='item.linkUrl'>
+        <img :src ='item.picUrl' @load = "loadImage" />
       </a>
-        </div>
-      </slider>
-    </div>
+          </div>
+        </slider>
       </div>
-  </div>
+      <div class="recommend-list">
+        <h1 class="list-title">热门歌单推荐</h1>
+        <ul>
+          <li v-for="item in discList" class="item">
 
+            <div class="icon">
+              <img :src="item.imgurl" width="60" height="60" />
+            </div>
+            <div class="text">
+              <h2 class="name" v-html="item.creator.name"></h2>
+              <p class=" desc " v-html="item.dissname">
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </scroll>
 </div>
 </template>
 
 
 <script type="text/ecmascript-6">
 import {
-  getRecommend,getDiscList
+  getRecommend,
+  getDiscList
 } from 'api/recommend'
 import {
   ERR_OK
 } from 'api/config'
 import Slider from 'base/slider/slider'
+import Scroll from 'base/scroll/scroll'
 export default {
   data() {
     return {
-      recommends: []
+      recommends: [],
+      discList: [],
     }
   },
 
   created() {
     this._getRecommend()
     this._getDiscList()
+  
   },
 
   methods: {
@@ -51,14 +69,27 @@ export default {
     },
     _getDiscList() {
       getDiscList().then((res) => {
+        if (res.code === ERR_OK) {
           console.log(res);
+          this.discList = res.data.list
+        }
 
       })
     },
+    loadImage(){
+//知道一张图片就可以
+      console.log('img is load');
+      if(!this.checkLoaded){
+          this.$refs.scroll.refresh()
+          this.checkLoaded = true
+      }
+
+    }
   },
 
   components: {
     Slider,
+    Scroll
   }
 }
 </script>
