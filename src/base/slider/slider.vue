@@ -16,7 +16,6 @@
 
 
   export default {
-
     props: {
       loop: {
         type: Boolean,
@@ -45,6 +44,8 @@
         currentPageIndex: 0
       }
     },
+
+
     mounted() {
       setTimeout(() => {
         this._setSlideWidth()
@@ -98,6 +99,8 @@
       this.slide.disable()
       clearTimeout(this.timer)
     },
+
+
     methods: {
       refresh() {
         this._setSlideWidth(true)

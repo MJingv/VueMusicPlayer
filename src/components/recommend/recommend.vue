@@ -3,7 +3,6 @@
   <div class="recommend-content" ref = "scroll">
     <div>
 
-
     <div  v-if="recommends.length" class=" slider-wrapper" ref="sliderWrapper">
       <slider>
         <div v-for="item in recommends">
@@ -23,7 +22,7 @@
 
 <script type="text/ecmascript-6">
 import {
-  getRecommend
+  getRecommend,getDiscList
 } from 'api/recommend'
 import {
   ERR_OK
@@ -38,6 +37,7 @@ export default {
 
   created() {
     this._getRecommend()
+    this._getDiscList()
   },
 
   methods: {
@@ -47,6 +47,12 @@ export default {
           console.log(res.data.slider);
           this.recommends = res.data.slider
         }
+      })
+    },
+    _getDiscList() {
+      getDiscList().then((res) => {
+          console.log(res);
+
       })
     },
   },
