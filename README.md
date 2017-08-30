@@ -21,4 +21,5 @@ npm run build --report
 ```
 axios  ---  fix the data exchange
 better-scroll  ---  perfect the scroll function 
+v-lazy  ---  use the v-lazy-load to lazy load imgs
 
