@@ -14,7 +14,6 @@
   import {addClass} from 'common/js/dom'
   import BScroll from 'better-scroll'
 
-
   export default {
     name: 'slider',
     props: {

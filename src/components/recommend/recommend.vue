@@ -7,7 +7,7 @@
         <slider>
           <div v-for="item in recommends">
             <a :href='item.linkUrl'>
-        <img :src ='item.picUrl' @load = "loadImage" />
+        <img :src ='item.picUrl' @load = "loadImage" ref = 'lazyImg' />
       </a>
           </div>
         </slider>
@@ -18,7 +18,7 @@
           <li v-for="item in discList" class="item">
 
             <div class="icon">
-              <img :src="item.imgurl" width="60" height="60" />
+              <img v-lazy="item.imgurl" width="60" height="60" />
             </div>
             <div class="text">
               <h2 class="name" v-html="item.creator.name"></h2>
@@ -55,7 +55,7 @@ export default {
   created() {
     this._getRecommend()
     this._getDiscList()
-  
+
   },
 
   methods: {
@@ -79,11 +79,10 @@ export default {
     loadImage(){
 //知道一张图片就可以
       console.log('img is load');
-      if(!this.checkLoaded){
+      if(!this.checkLoaded  ){
           this.$refs.scroll.refresh()
           this.checkLoaded = true
       }
-
     }
   },
 
