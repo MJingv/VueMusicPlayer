@@ -1,5 +1,5 @@
 <template>
-<scroll class="listview" :data="data" ref="listview">
+<scroll class="listview" :data="data" ref="listview" :listenScroll="listenScroll" @scroll="scroll" :probeType="probeType">
   <slot>
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
@@ -14,19 +14,15 @@
     </ul>
     <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove="onShortcutTouchMove">
       <ul>
-        <li v-for="(item,index) in shortcutlist" class="item" :data-index="index">
+        <li v-for="(item,index) in shortcutlist" class="item" :data-index="index" :class="{'current':currentIndex === index }">
           {{item}}
         </li>
-
       </ul>
-
     </div>
 
   </slot>
 </scroll>
 </template>
-
-
 
 <script>
 import Scroll from 'base/scroll/scroll'
@@ -38,8 +34,21 @@ export default {
   created() {
     //不需要观测变化的值
     this.touch = {}
+    this.listenScroll = true
+    this.listHeight = []
+    this.probeType = 3
+  },
+  mounted() {
+    // console.log(this.listHeight);
   },
 
+  data() {
+    return {
+      scrollY: -1,
+      currentIndex: 0,
+    }
+
+  },
   props: {
     data: {
       type: Array,
@@ -49,6 +58,7 @@ export default {
   },
   computed: {
     shortcutlist() {
+
       return this.data.map((i) => { //只取第一个字
         return i.title.substring(0, 1)
       })
@@ -71,15 +81,62 @@ export default {
       //滑动扫过的item个数
       let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0 //向下取整
       let anchorIndex = parseInt(this.touch.anchorIndex) + delta
-      console.log(anchorIndex + 'now');
       this._scrollTo(anchorIndex)
 
     },
+    scroll(pos) {
+      this.scrollY = pos.y
+    },
     _scrollTo(index) {
+      //高亮定位到对应位置
+      this.scrollY = -this.listHeight[index]
       //定位到listGroup对应到位置
-      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)//缓存动画时间为0
-    }
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0) //缓存动画时间为0
+    },
+    _calculateHeight() {
+      //保存每个listgroup的高度
+      const list = this.$refs.listGroup
 
+      let height = 0
+      this.listHeight.push(height)
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+
+  },
+  watch: {
+    data() {
+      //确保dom已经渲染完
+      setTimeout(() => {
+        this._calculateHeight()
+      }, 20)
+    },
+    scrollY(newY) {
+      //传入pos
+
+      const listHeight = this.listHeight
+      //当滚动到顶部 nowY>0
+      if (newY > 0) {
+        this.currentIndex = 0
+        return
+      }
+      //当nowy在中间滚动
+      for (let i = 0; i < listHeight.length - 1; i++) {
+        let height1 = listHeight[i];
+        let height2 = listHeight[i + 1];
+        if (-newY >= height1 && (-newY) < height2) {
+          //在2个item之间，返回位置是i
+          this.currentIndex = i
+          return
+        }
+      }
+      //当nowy滚到底部,>最后元素的上限
+      this.currentIndex = listHeight.length - 2
+
+    }
   },
   components: {
     Scroll
