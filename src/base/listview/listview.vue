@@ -1,17 +1,26 @@
 <template>
-<scroll class="listview" :data="data">
+<scroll class="listview" :data="data" ref="listview">
   <slot>
     <ul>
-      <li v-for="group in data" class="list-group">
+      <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
           <li v-for="i in group.items" class="list-group-item">
-            <img v-lazy="i.avatar" class="avatar"/>
+            <img v-lazy="i.avatar" class="avatar" />
             <span class="name">{{i.name}}</span>
           </li>
         </ul>
       </li>
     </ul>
+    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove="onShortcutTouchMove">
+      <ul>
+        <li v-for="(item,index) in shortcutlist" class="item" :data-index="index">
+          {{item}}
+        </li>
+
+      </ul>
+
+    </div>
 
   </slot>
 </scroll>
@@ -21,8 +30,16 @@
 
 <script>
 import Scroll from 'base/scroll/scroll'
-
+import {
+  getData
+} from 'common/js/dom'
+const ANCHOR_HEIGHT = 18
 export default {
+  created() {
+    //不需要观测变化的值
+    this.touch = {}
+  },
+
   props: {
     data: {
       type: Array,
@@ -30,9 +47,43 @@ export default {
     },
 
   },
+  computed: {
+    shortcutlist() {
+      return this.data.map((i) => { //只取第一个字
+        return i.title.substring(0, 1)
+      })
+    }
+
+  },
+  methods: {
+    onShortcutTouchStart(e) {
+      // console.log(e.target.getAttribute('data-index'));
+      let anchorIndex = getData(e.target, 'index')
+      //获取第一个手势的位置
+      let firstTouch = e.touches[0]
+      this.touch.y1 = firstTouch.pageY
+      this.touch.anchorIndex = anchorIndex
+      this._scrollTo(anchorIndex)
+    },
+    onShortcutTouchMove(e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      //滑动扫过的item个数
+      let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0 //向下取整
+      let anchorIndex = parseInt(this.touch.anchorIndex) + delta
+      console.log(anchorIndex + 'now');
+      this._scrollTo(anchorIndex)
+
+    },
+    _scrollTo(index) {
+      //定位到listGroup对应到位置
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)//缓存动画时间为0
+    }
+
+  },
   components: {
     Scroll
-  }
+  },
 }
 </script>
 

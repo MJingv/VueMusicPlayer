@@ -33,7 +33,7 @@ export default {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
           this.singers = this._normalizeSinger(res.data.list)
-          console.log(this.singers);
+          
         }
       })
     },
@@ -93,7 +93,7 @@ export default {
   },
   components: {
     ListView
-  }
+  },
 }
 </script>
 

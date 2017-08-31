@@ -46,21 +46,30 @@ export default {
         click: this.click
       })
     },
-    enabled(){
+    enabled() {
       this.scroll && this.scroll.enabled()
     },
-    disable(){
+    disable() {
       this.scroll && this.scroll.disable()
     },
-    refresh(){
+    refresh() {
       this.scroll && this.scroll.refresh()
+    },
+    scrollTo() {
+      //调用apply传入参数
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+    },
+    scrollToElement() {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
+
     }
+
   },
-  watch:{
-    data(){
-      setTimeout(()=>{
+  watch: {
+    data() {
+      setTimeout(() => {
         this.refresh()
-      },20)
+      }, 20)
     }
   }
 
