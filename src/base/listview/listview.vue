@@ -5,7 +5,7 @@
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="i in group.items" class="list-group-item">
+          <li v-for="i in group.items" class="list-group-item" @click="selectItem(i)">
             <img v-lazy="i.avatar" class="avatar" />
             <span class="name">{{i.name}}</span>
           </li>
@@ -23,9 +23,9 @@
       <h1 class="fixed-title">{{fixedTitle}}</h1>
     </div>
   </slot>
-<div v-show = "!data.length" class="loading-container">
-  <loading></loading>
-</div>
+  <div v-show="!data.length" class="loading-container">
+    <loading></loading>
+  </div>
 </scroll>
 </template>
 
@@ -35,9 +35,9 @@ import Loading from 'base/loading/loading'
 import {
   getData
 } from 'common/js/dom'
+
 const ANCHOR_HEIGHT = 18
 const TITLE_HEIGHT = 30
-
 
 export default {
   created() {
@@ -104,6 +104,10 @@ export default {
       this.scrollY = pos.y
 
     },
+    selectItem(i) {
+      //将点击的item派发出去
+      this.$emit('select', i)
+    },
     _scrollTo(index) {
       if (!index && index !== 0) {
         //如果index为nullor0
@@ -154,24 +158,24 @@ export default {
           //在2个item之间，返回位置是i
           this.currentIndex = i
           this.diff = height2 + newY
+          console.log('newy:' + newY);
+          console.log('height2:' + height2);
+          console.log('diff:' + this.diff);
           return
         }
       }
       //当nowy滚到底部,>最后元素的上限
       this.currentIndex = listHeight.length - 2
-
     },
     diff(newVal) {
-      let fixedTop =  (newVal && newVal < TITLE_HEIGHT) ?
-        newVal - TITLE_HEIGHT :
-        0
+      let fixedTop = (newVal && newVal < TITLE_HEIGHT) ?
+        newVal - TITLE_HEIGHT : 0
       if (this.fixedTop === fixedTop) {
         return
       }
       this.fixedTop = fixedTop
       this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       //开启3d gpu加速
-
 
     },
   },

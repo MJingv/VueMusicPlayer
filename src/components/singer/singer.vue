@@ -1,6 +1,8 @@
 <template>
 <div class="singer">
-  <list-view :data="singers"></list-view>
+  <list-view :data="singers" @select = "selectSinger"></list-view>
+  <!-- 路由匹配到的组件将渲染在这里 -->
+  <router-view></router-view>
 </div>
 </template>
 
@@ -29,11 +31,18 @@ export default {
     this._getSingerList()
   },
   methods: {
+    selectSinger(singer){
+      //监听，获取当前点击的singer-item
+    this.$router.push({
+      path:`/singer/${singer.id}`
+    })
+
+    },
     _getSingerList() {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
           this.singers = this._normalizeSinger(res.data.list)
-          
+
         }
       })
     },

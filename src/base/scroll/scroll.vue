@@ -1,9 +1,6 @@
 <template>
 <div ref="wrapper">
-  <slot>
-
-  </slot>
-
+  <slot></slot>
 </div>
 </div>
 </template>
@@ -49,10 +46,10 @@ export default {
         probeType: this.probeType,
         click: this.click
       })
-      if(this.listenScroll){
+      if (this.listenScroll) {
         let me = this //vue实例的this
-        this.scroll.on('scroll',(pos)=>{
-          me.$emit('scroll',pos)
+        this.scroll.on('scroll', (pos) => {
+          me.$emit('scroll', pos)
         })
 
       }
