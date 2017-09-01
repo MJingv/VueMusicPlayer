@@ -19,17 +19,26 @@
         </li>
       </ul>
     </div>
-
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
   </slot>
+<div v-show = "!data.length" class="loading-container">
+  <loading></loading>
+</div>
 </scroll>
 </template>
 
 <script>
 import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
 import {
   getData
 } from 'common/js/dom'
 const ANCHOR_HEIGHT = 18
+const TITLE_HEIGHT = 30
+
+
 export default {
   created() {
     //不需要观测变化的值
@@ -46,6 +55,7 @@ export default {
     return {
       scrollY: -1,
       currentIndex: 0,
+      diff: -1,
     }
 
   },
@@ -58,10 +68,15 @@ export default {
   },
   computed: {
     shortcutlist() {
-
       return this.data.map((i) => { //只取第一个字
         return i.title.substring(0, 1)
       })
+    },
+    fixedTitle() {
+      if (this.scrollY > 0) {
+        return
+      }
+      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
     }
 
   },
@@ -138,16 +153,31 @@ export default {
         if (-newY >= height1 && (-newY) < height2) {
           //在2个item之间，返回位置是i
           this.currentIndex = i
+          this.diff = height2 + newY
           return
         }
       }
       //当nowy滚到底部,>最后元素的上限
       this.currentIndex = listHeight.length - 2
 
-    }
+    },
+    diff(newVal) {
+      let fixedTop =  (newVal && newVal < TITLE_HEIGHT) ?
+        newVal - TITLE_HEIGHT :
+        0
+      if (this.fixedTop === fixedTop) {
+        return
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
+      //开启3d gpu加速
+
+
+    },
   },
   components: {
-    Scroll
+    Scroll,
+    Loading,
   },
 }
 </script>
