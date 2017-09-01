@@ -36,7 +36,7 @@ export default {
     this.touch = {}
     this.listenScroll = true
     this.listHeight = []
-    this.probeType = 3
+    this.probeType = 3 //当 probeType 为 3 的时候，不仅在屏幕滑动的过程中，而且在 momentum 滚动动画运行过程中实时派发 scroll 事件。
   },
   mounted() {
     // console.log(this.listHeight);
@@ -85,12 +85,21 @@ export default {
 
     },
     scroll(pos) {
+      //实时获取y轴位置
       this.scrollY = pos.y
+
     },
     _scrollTo(index) {
+      if (!index && index !== 0) {
+        //如果index为nullor0
+        return
+      } else if (index > this.listHeight.length - 2) {
+        //超出最大则手动设置为listhight最大值
+        index = this.listHeight.length - 2
+      }
       //高亮定位到对应位置
       this.scrollY = -this.listHeight[index]
-      //定位到listGroup对应到位置
+      //点击右边shortcut定位到listGroup对应到位置
       this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0) //缓存动画时间为0
     },
     _calculateHeight() {
@@ -116,7 +125,6 @@ export default {
     },
     scrollY(newY) {
       //传入pos
-
       const listHeight = this.listHeight
       //当滚动到顶部 nowY>0
       if (newY > 0) {
